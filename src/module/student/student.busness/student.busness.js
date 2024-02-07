@@ -117,12 +117,14 @@ const deleteStudentByToken = async (user) => {
         throw "error message"
     };
 };
-const getdata = async () => {
+const getdata = async (query) => {
     try {
-        const response = await Student.find();
+        const { page = 1 } = query;
+        const limit = 10;
+        const skip=(page-1)*limit
+        const response = await Student.find().populate("class").skip(skip).limit(limit);
         console.log("response----------------->>", response);
         if (!response) throw "invalited data find";
-
         return {
             msg: "okk sucessfully data ",
             count: response.length,

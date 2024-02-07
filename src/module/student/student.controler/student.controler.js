@@ -10,7 +10,7 @@ exports.login = async (req) => await login(req.body);
 exports.getStudentByToken = async (req) => await getStudentByToken(req.user);
 exports.updateStudentByToken = async (req) => await updateStudentByToken(req.body, req.user);
 exports.deleteStudentByToken = async (req) => await deleteStudentByToken(req.user);
-exports.getdata = async (req) => await getdata();
+exports.getdata = async (req) => await getdata(req.query);
 exports.getStudentById = async (req) => await getStudentById(req.params.id);
 exports.updateStudentById = async (req) => await updateStudentById(req.body, req.params.id)
 exports.deleteStudentById = async (req) => await deleteStudentById(req.params.id);

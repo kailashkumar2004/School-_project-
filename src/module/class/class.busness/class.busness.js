@@ -3,7 +3,7 @@ const express = require("express");
 const { Class } = require("../class.model/class.model");
 
 const addClass = async (body) => {
-    try {
+    try {   
         const data = new Class(body);
         console.log("data--------------->>", data);
         if (!data) throw "user data not find";

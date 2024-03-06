@@ -2,26 +2,24 @@ const mongoose = require("mongoose");
 const express = require("express");
 const { Class } = require("../class.model/class.model");
 
-const addClass = async (body) => {
-    try {   
-        const data = new Class(body);
-        console.log("data--------------->>", data);
-        if (!data) throw "user data not find";
-        const savedata = await data.save();
-        console.log("savedata------------->>", savedata);
-        if (!savedata) throw "invalited data find";
-        return {
-            msg: "added data sucessfully",
-            result: savedata
-        };
-    } catch (error) {
-        console.log("error----------------->>", error);
-        throw "error message"
+const createClass = async (body) => {
+    const newClass = new Class(body);
+    console.log("newClass--------------------->>", newClass);
+    if (!newClass) {
+        throw "newClass data not find"
+    };
+    const response = await newClass.save();
+    return {
+        msg: "create class sucess",
+        result: response
     };
 };
-const getClass = async () => {
+const allClass = async (query) => {
     try {
-        const response = await Class.find();
+        const { page = 1 } = query;
+        const limit = 10;
+        const skip=(page-1)*limit
+        const response = await Class.find().skip(skip).limit(limit).sort({createdAt:-1});
         console.log("response-------------->>", response);
         if (!response) throw "invalited data find";
         return {
@@ -143,5 +141,5 @@ const searchdataWithQuery = async (query) => {
     };
 };
 module.exports = {
-    addClass, getClass, getClassById, updateClassById, deleteClassById,
+    createClass, allClass, getClassById, updateClassById, deleteClassById,
     searchClass,searchWithClass,searchdata,searchdataWithQuery}

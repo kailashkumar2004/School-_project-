@@ -8,24 +8,27 @@ const jwt = require("jsonwebtoken");
 const { authenticate } = require("../../../midleware/authmidleware");
 
 
-
-const addStudent = async (body) => {
-    try {
-        const data = new Student(body);
-        console.log("data------------------>>", data);
-        if (!data) throw "user data not find";
-        const savedata = await data.save();
-        console.log("savedata--------------->>", savedata);
-        if (!savedata) throw "email allready register";
-
-        return {
-            msg: "added data sucessfully",
-            result: savedata
+const createStudent = async (body) => {
+    // try {
+        const existingUser = await Student.findOne({ email: body.email });
+        console.log("existingUser------------------->>", existingUser);
+        if (existingUser) {
+            throw "email allready register"
         };
-    } catch (error) {
-        console.log("error--------------------->>", error);
-        throw "error message"
-    };
+        const newStuden = new Student(body);
+        console.log("newStuden------------------->>", newStuden);
+        if (!newStuden) {
+            throw "newStudent data is not find"
+        };
+        const response = await newStuden.save();
+        return {
+            msg: "create student sucessfully",
+            result: response
+        };
+    // } catch (error) {
+    //     console.log("error-=---------------------->>", error);
+    //     throw "New Error message"
+    // };
 };
 const register = async (body) => {
     try {
@@ -104,7 +107,7 @@ const updateStudentByToken = async (body, user) => {
 };
 const deleteStudentByToken = async (user) => {
     try {
-        const deletedata = await Student.findByIdAndDelete(user);
+        const deletedata = await Student.findByIdAndDelete(user).populate("class");
         console.log("deletedata--------------->>", deletedata);
         if (!deletedata) throw "invalited data find";
 
@@ -117,24 +120,27 @@ const deleteStudentByToken = async (user) => {
         throw "error message"
     };
 };
-const getdata = async (query) => {
+const allStuden = async (query) => {
     try {
         const { page = 1 } = query;
         const limit = 10;
         const skip=(page-1)*limit
-        const response = await Student.find().populate("class").skip(skip).limit(limit);
+        const response = await Student.find().populate("class").skip(skip).limit(limit).sort({createdAt:-1});
         console.log("response----------------->>", response);
-        if (!response) throw "invalited data find";
+        if (!response) {
+            throw "data is not find"
+        };
         return {
-            msg: "okk sucessfully data ",
+            msg: "okk sucessfully recive data",
             count: response.length,
             result: response
         };
     } catch (error) {
-        console.log("error-------------------->>", error);
-        throw "error message"
+        console.log("error----------------------->>", error);
+        throw "New Error message"
     };
 };
+
 const getStudentById = async (id) => {
     try {
         const getdata = await Student.findById(id).populate("class");
@@ -263,7 +269,6 @@ const searchdataWithquery = async (query) => {
 const searchWithFilters = async (body) => {
     try {
       const query = {};
-  
       if (body.country && Array.isArray(body.country) && body.country.length > 0) {
         query["addresh.cuntery"] = { $in: body.country };
       }
@@ -302,9 +307,57 @@ const searchWithFilters = async (body) => {
       throw "Error retrieving data";
     }
   };
-  
+const resetPassword = async (user,body) => {
+    try {
+        const { email, oldPassword, newPassword, confirmPassword } = body;
+        if (!email && !oldPassword && !newPassword && !confirmPassword) {
+            throw "no matching filed"
+        };
+        const users = await Student.findOne({ email });
+        console.log("users====================>>", users);
+        if (!users) {
+            throw "users data not found"
+        };
+        const isPasswordMath = await bcrypt.compare(oldPassword, users.password);
+        console.log("isPasswordMath------------------>>", isPasswordMath);
+        if (!isPasswordMath) {
+            throw "invalited password find"
+        };
+        if (newPassword !== confirmPassword) {
+            throw "miss match Password find"
+        };
+        users.password = await bcrypt.hash(newPassword, 10);
+        await users.save();
+
+        return {
+            msg: "resetPassword sucessfully",
+            result: users
+        };
+    } catch (error) {
+        console.log("error-------------------->>", error);
+        throw "New Error message"
+    };
+};
+const updatePassword = async (user, body, id) => {
+    const { newPassword } = body;
+    const student = await Student.findById(id).populate("class");
+    console.log("student------------------>>", student);
+    if (!student) {
+        throw "student data not found"
+    };
+    const saltRounds = 11;
+    const hashedPassword = await bcrypt.hash(body.newPassword, saltRounds);
+    student.password = hashedPassword;
+
+    await student.save();
+
+    return {
+        mgs: "updatePassword seucessfully",
+        result:student
+    }
+};
 module.exports = {
-    addStudent, register, login, getStudentByToken, updateStudentByToken,
-    deleteStudentByToken, getdata, getStudentById, updateStudentById, deleteStudentById
+    createStudent, register, login, getStudentByToken, updateStudentByToken,
+    deleteStudentByToken, allStuden, getStudentById, updateStudentById, deleteStudentById
     , searchWithname, searchWithuserName, searchdata, searchdataTokenWithuery, searchdataWithquery,
-    searchWithFilters};
+    searchWithFilters,resetPassword,updatePassword};

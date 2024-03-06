@@ -3,16 +3,16 @@ const router = express.Router();
 const { wrapAsync } = require("../../../helpres/router.helpres");
 
 
-const { addSchool, getSchool, getSchoolById, updateSchoolById, deleteSchoolById,
-    searchdataWithquery} = require("../school.controler/school.controler");
+const { createSchool, allSchool, getSchoolById, updateSchoolById, deleteSchoolById,
+    searchWithquery} = require("../school.controler/school.controler");
 
 
-router.post("/addSchool", wrapAsync(addSchool));
-router.get("/getSchool", wrapAsync(getSchool));
+router.post("/createSchool", wrapAsync(createSchool));
+router.get("/allSchool", wrapAsync(allSchool));
 router.get("/getSchoolById/:id", wrapAsync(getSchoolById));
 router.put("/updateSchoolById/:id", wrapAsync(updateSchoolById));
 router.delete("/deleteSchoolById/:id", wrapAsync(deleteSchoolById));
-router.get("/searchdataWithquery", wrapAsync(searchdataWithquery));
+router.get("/searchWithquery", wrapAsync(searchWithquery));
 
 
 

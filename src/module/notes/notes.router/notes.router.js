@@ -3,21 +3,20 @@ const router = express.Router();
 const { wrapAsync } = require("../../../helpres/router.helpres");
 
 
-const { addNotes, getNotes, getNotesById, updateNotesById,
-    deleteNotesById, searchWithnotes, searchdataWithnotesName,
-    searchdata,searchdataWithquery} = require("../notes.controler/notes.controler");
+const { createNotes, allNotes, getNotesById, updateNotesById,
+    deleteNotesById, searchNotes, searchWithnotesName
+    ,searchNotesWithquery } = require("../notes.controler/notes.controler");
 
 
 
-router.post("/addNotes", wrapAsync(addNotes));
-router.get("/getNotes", wrapAsync(getNotes));
+router.post("/createNotes", wrapAsync(createNotes));
+router.get("/allNotes", wrapAsync(allNotes));
 router.get("/getNotesById/:id", wrapAsync(getNotesById));
 router.put("/updateNotesById/:id", wrapAsync(updateNotesById));
 router.delete("/deleteNotesById/:id", wrapAsync(deleteNotesById));
-router.post("/searchWithnotes", wrapAsync(searchWithnotes));
-router.post("/searchdataWithnotesName", wrapAsync(searchdataWithnotesName));
-router.post("/searchdata", wrapAsync(searchdata));
-router.get("/searchdataWithquery", wrapAsync(searchdataWithquery));
+router.post("/searchNotes", wrapAsync(searchNotes));
+router.post("/searchWithnotesName", wrapAsync(searchWithnotesName));
+router.get("/searchNotesWithquery", wrapAsync(searchNotesWithquery));
 
 
 

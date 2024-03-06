@@ -8,7 +8,7 @@ const event = require("./src/module/event/event.router/event.router");
 module.exports = [
     {
         path: "/api/student",
-        handler:student
+        handler:student 
     },
     {
         path: "/api/classRouter",

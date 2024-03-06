@@ -2,26 +2,25 @@ const mongoose = require("mongoose");
 const express = require("express");
 const { Event } = require("../event.model/event.model");
 
-const addEvent = async (body) => {
-    try {
-        const data = new Event(body);
-        console.log("data---------------->>", data);
-        if (!data) throw "user data not find";
-        const savedata = await data.save();
+const createEvent = async (body) => {
+    const newEvent = new Event(body);
+    console.log("newEvent------------------>>", newEvent);
+    if (!newEvent) {
+        throw "newEvent data not found"
+    };
+    const response = await newEvent.save();
 
-        return {
-            msg: "added data sucessfully",
-            result: savedata
-        };
-
-    } catch (error) {
-        console.log("error-------------------->>", error);
-        throw "error message"
-    }
+    return {
+        msg: "create Event sucess",
+        result: response
+    };
 };
-const getEvent = async () => {
+const allEvent = async (query) => {
     try {
-        const response = await Event.find().populate("class");
+        const { page = 1 } = query;
+        const limit = 10;
+        const skip=(page-1)*limit
+        const response = await Event.find().populate("class").skip(skip).limit(limit).sort({createdAt:-1});
         console.log("response-------------------->", response);
         if (!response) throw "invalited data find";
 
@@ -36,63 +35,52 @@ const getEvent = async () => {
     };
 };
 const getEventById = async (id) => {
-    try {
-        const getdata = await Event.findById(id).populate("class");
-        console.log("getdata-------------------->>", getdata);
-        if (!getdata) throw "invalited data find";
-
-        return {
-            msg: "okk sucessfully data",
-            result: getdata
-        };
-    } catch (error) {
-        console.log("error------------------------>>", error);
-        throw "error message"
+    const getEvent = await Event.findById(id).populate("class");
+    console.log("getEvent---------------->>", getEvent);
+    if (!getEvent) {
+        throw "getEvent data not find"
+    };
+    return {
+        msg: "okk sucessfully getEvent",
+        result: getEvent
     };
 };
 const updateEventById = async (body, id) => {
     try {
-        const updatedata = await Event.findByIdAndUpdate(id, { $set: body }, { new: true }).populate("class");
-        console.log("updatedata------------------>>", updatedata);
-        if (!updatedata) throw "invalited data find";
-
+        const updateEvent = await Event.findByIdAndUpdate(id, { $set: body }, { new: true }).populate("class");
+        console.log("updateEvent---------------->>", updateEvent);
+        if (!updateEvent) {
+            throw "updateEvent data is not find"
+        };
         return {
-            msg: "updatedata sucessfully",
-            result: updatedata
+            msg: "update Event data sucess",
+            result: updateEvent
         };
     } catch (error) {
-        console.log("error----------------------->>", error);
-        throw "error message"
+        console.log("error---------------------------->>", error);
+        throw "New Error message"
     };
 };
 const deleteEventById = async (id) => {
-    try {
-        const deleteEvent = await Event.findByIdAndDelete(id);
-        console.log("deleteEvent-------------->>", deleteEvent);
-        if (!deleteEvent) throw "invalited data find";
-
-        return {
-            msg: "delete data sucessfully",
-            result: deleteEvent
-        };
-    } catch (error) {
-        console.log("error---------------------->>", error);
-        throw "error message"
+    const deleteEvents = await Event.findByIdAndDelete(id).populate("class");
+    console.log("deleteEvents----------------->>", deleteEvents);
+    if (!deleteEvents) {
+        throw "deleteEvents data not find"
+    };
+    return {
+        msg: "deleteEvents data sucess",
+        result: deleteEvents
     };
 };
-const searchWithname = async (body) => {
-    try {
-        const searchdata = await Event.findOne({ eventName: body.eventName }).populate("class");
-        console.log("searchdata-------------<<", searchdata);
-        if (!searchdata) throw "invalited data find";
-
-        return {
-            msg: "okk sucess data",
-            result: searchdata
-        };
-    } catch (error) {
-        console.log("error------------------------>>", error);
-        throw "error message"
+const searchEventsName = async (body) => {
+    const searchEvents = await Event.findOne({ eventName: body.eventName }).populate("class");
+    console.log("searchEvents----------------->>", searchEvents);
+    if (!searchEvents) {
+        throw "searchEvents data not find"
+    };
+    return {
+        msg: "searchEvents data sucess",
+        result: searchEvents
     };
 };
 const searchWitheventName = async (body) => {
@@ -150,7 +138,6 @@ const upcomingEvents = async () => {
         const upcomingdate = await Event.find({ assignDate: { $gt: currentDate } }).populate("class");
         console.log("upcomingdate----------------->>", upcomingdate);
         if (upcomingdate > currentDate) throw "No upcoming events found";
-
         return {
             msg: "upcomingdate sucessfully data",
             count: upcomingdate.length,
@@ -180,7 +167,7 @@ const pastEvents = async () => {
 };
 
 module.exports = {
-    addEvent, getEvent, getEventById, updateEventById,
-    deleteEventById, searchWithname, searchWitheventName,
+    createEvent, allEvent, getEventById, updateEventById,
+    deleteEventById, searchEventsName, searchWitheventName,
     searchdata, searchdataWithquery, upcomingEvents,pastEvents 
 }

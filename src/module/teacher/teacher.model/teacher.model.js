@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { scretKey } = require("../../../../config");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const teacherSchema = new mongoose.Schema({
     firstName: {
         type: String

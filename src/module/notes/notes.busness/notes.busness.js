@@ -2,27 +2,24 @@ const mongoose = require("mongoose");
 const express = require("express");
 const { Notes } = require("../notes.model/notes.model");
 
-const addNotes = async (body) => {
-    try {
-        const data = new Notes(body);
-        console.log("data------------------->>", data);
-        if (!data) throw "invalited data find";
-        const saveNotes = await data.save();
-        console.log("saveNotes------------------>>", saveNotes);
-        if (!saveNotes) throw "data is not find";
-
-        return {
-            msg: "okk added data sucess",
-            result: saveNotes
-        };
-    } catch (error) {
-        console.log("error--------------------->>", error);
-        throw "error message"
+const createNotes = async (body) => {
+    const newNotes = new Notes(body);
+    console.log("newNotes---------------------->>", newNotes);
+    if (!newNotes) {
+        throw "newNotes data not find"
+    };
+    const response = await newNotes.save();
+    return {
+        msg: "createNotes sucess",
+        result: response
     };
 };
-const getNotes = async () => {
+const allNotes = async (query) => {
     try {
-        const response = await Notes.find().populate("class");
+        const { page = 1 } = query;
+        const limit = 10;
+        const skip=(page-1)*limit
+        const response = await Notes.find().populate("class").skip(skip).limit(limit).sort({createdAt:-1});
         console.log("response---------------->>", response);
         if (!response) throw "invalited data find";
 
@@ -37,18 +34,14 @@ const getNotes = async () => {
     };
 };
 const getNotesById = async (id) => {
-    try {
-        const getdata = await Notes.findById(id).populate("class");
-        console.log("getdata------------------>>", getdata);
-        if (!getdata) throw "invalited data find";
-
-        return {
-            msg: "okk sucessfully data",
-            result: getdata
-        };
-    } catch (error) {
-        console.log("error---------------------->>", error);
-        throw "error message"
+    const getNotes = await Notes.findById(id).populate("class");
+    console.log("getNotes----------------->>", getNotes);
+    if (!getNotes) {
+        throw "getNotes data is not find"
+    };
+    return {
+        msg: "okk sucessfully",
+        result: getNotes
     };
 };
 const updateNotesById = async (body, id) => {
@@ -68,7 +61,7 @@ const updateNotesById = async (body, id) => {
 };
 const deleteNotesById = async (id) => {
     try {
-        const deletedata = await Notes.findByIdAndDelete(id);
+        const deletedata = await Notes.findByIdAndDelete(id).populate("class");
         console.log("deletedata------------------>>", deletedata);
         if (!deletedata) throw "invalited data find";
 
@@ -81,22 +74,24 @@ const deleteNotesById = async (id) => {
         throw "error message"
     };
 };
-const searchWithnotes = async (body) => {
+const searchNotes = async (body) => {
     try {
-        const searchdata = await Notes.findOne({ notesName: body.notesName }).populate("class");
-        console.log("searchdata---------------->>", searchdata);
-        if (!searchdata) throw "invalited data find";
-
+        const searchNotes = await Notes.find(body).populate("class");
+        console.log("searchNotes------------------->>", searchNotes);
+        if (!searchNotes) {
+            throw "searchNotes data not find"
+        };
         return {
-            msg: "okk sucessfully data",
-            result: searchdata
+            msg: "searchNotes sucess",
+            count: searchNotes.length,
+            result: searchNotes
         };
     } catch (error) {
-        console.log("error-------------------->>", error);
-        throw "error message"
+        console.log("error----------------------->>", error);
+        throw "New Error message"
     };
 };
-const searchdataWithnotesName = async (body) => {
+const searchWithnotesName = async (body) => {
     try {
         const searchdata = await Notes.find({ notesName: body.notesName }).populate("class");
         console.log("searchdata-------------->>", searchdata);
@@ -112,23 +107,8 @@ const searchdataWithnotesName = async (body) => {
         throw "error message"
     };
 };
-const searchdata = async (body) => {
-    try {
-        const searchdata = await Notes.find(body).populate("class");
-        console.log("searchdata------------------>>", searchdata);
-        if (!searchdata) throw "invalited data find";
 
-        return {
-            msg: "okk sucessfully data",
-            count: searchdata.length,
-            result: searchdata
-        };
-    } catch (error) {
-        console.log("error------------------->>", error);
-        throw "error message"
-    };
-};
-const searchdataWithquery = async (query) => {
+const searchNotesWithquery = async (query) => {
     try {
         const searchdata = await Notes.find(query).populate("class");
         console.log("searchdata------------------>>", searchdata);
@@ -145,6 +125,5 @@ const searchdataWithquery = async (query) => {
     };
 };
 module.exports = {
-    addNotes, getNotes, getNotesById, updateNotesById,
-    deleteNotesById, searchWithnotes, searchdataWithnotesName,
-    searchdata,searchdataWithquery};
+    createNotes, allNotes, getNotesById, updateNotesById,
+    deleteNotesById, searchNotes, searchWithnotesName,searchNotesWithquery};

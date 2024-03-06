@@ -2,27 +2,24 @@ const mongoose = require("mongoose");
 const express = require("express");
 const { School } = require("../school.model/school.model");
 
-const addSchool = async (body) => {
-    try {
-        const data = new School(body);
-        console.log("data--------------->>", data);
-        if (!data) throw "data is not find";
-        const savedata = await data.save();
-        console.log("savedata------------->>", savedata);
-        if (!savedata) throw "email allready register";
-
-        return {
-            msg: "added data sucessfully",
-            result: savedata
-        };
-    } catch (error) {
-        console.log("error----------------->>", error);
-        throw "error message"
+const createSchool = async (body) => {
+    const newSchool = new School(body);
+    console.log("newSchool---------------------",newSchool);
+    if (!newSchool) {
+        throw "newSchool data not find"
+    };
+    const response = await newSchool.save();
+    return {
+        msg: "create school data sucess",
+        result: response
     };
 };
-const getSchool = async () => {
+const allSchool = async (query) => {
     try {
-        const response = await School.find();
+        const { page = 1 } = query;
+        const limit = 10;
+        const skip=(page-1)*limit
+        const response = await School.find().skip(skip).limit(limit).sort({createdAt:-1});
         console.log("response========<<>>", response);
         if (!response) throw "invalited data find";
 
@@ -81,23 +78,19 @@ const deleteSchoolById = async (id) => {
         throw "error message"
     };
 };
-const searchdataWithquery = async (query) => {
-    try {
-        const searchdata = await School.find(query);
-        console.log("searchdata----------->>", searchdata);
-        if (!searchdata) throw "invalited data find";
-
-        return {
-            msg: "okk sucessfully data",
-            count: searchdata.length,
-            result: searchdata
-        };
-    } catch (error) {
-        console.log("error--------------->>", error);
-        throw "error message"
+const searchWithquery = async (query) => {
+    const searchdata = await School.find(query);
+    console.log("searchdata------------------>>", searchdata);
+    if (!searchdata) {
+        throw "searchdata not found"
+    };
+    return {
+        msg: "okk sucess",
+        count: searchdata.length,
+        result: searchdata
     };
 };
 module.exports = {
-    addSchool, getSchool, getSchoolById, updateSchoolById, deleteSchoolById,
-    searchdataWithquery
+    createSchool, allSchool, getSchoolById, updateSchoolById, deleteSchoolById,
+    searchWithquery
 }

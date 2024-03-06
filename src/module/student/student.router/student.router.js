@@ -3,20 +3,21 @@ const router = express.Router();
 const { authenticate } = require("../../../midleware/authmidleware");
 const { wrapAsync } = require("../../../helpres/router.helpres");
 
-const { addStudent, register, login, getStudentByToken,
-    updateStudentByToken, deleteStudentByToken, getdata,
+const { createStudent, register, login, getStudentByToken,
+    updateStudentByToken, deleteStudentByToken, allStuden,
     getStudentById, updateStudentById, deleteStudentById,
     searchWithname, searchWithuserName, searchdata, searchdataTokenWithuery,
-    searchdataWithquery,searchWithFilters} = require("../student.controler/student.controler");
+    searchdataWithquery, searchWithFilters, resetPassword,
+    updatePassword} = require("../student.controler/student.controler");
 
 
-router.post("/addStudent", wrapAsync(addStudent))
+router.post("/createStudent", wrapAsync(createStudent))
 router.post("/register", wrapAsync(register));
 router.post("/login", wrapAsync(login));
 router.get("/getStudentByToken", authenticate, wrapAsync(getStudentByToken));
 router.put("/updateStudentByToken", authenticate, wrapAsync(updateStudentByToken));
 router.delete("/deleteStudentByToken", authenticate, wrapAsync(deleteStudentByToken));
-router.get("/getdata", wrapAsync(getdata));
+router.get("/allStuden", wrapAsync(allStuden));
 router.get("/getStudentById/:id", wrapAsync(getStudentById));
 router.put("/updateStudentById/:id", wrapAsync(updateStudentById));
 router.delete("/deleteStudentById/:id", wrapAsync(deleteStudentById));
@@ -26,6 +27,7 @@ router.post("/searchdata", wrapAsync(searchdata));
 router.get("/searchdataTokenWithuery", authenticate, wrapAsync(searchdataTokenWithuery));
 router.get("/searchdataWithquery", wrapAsync(searchdataWithquery));
 router.post("/searchWithFilters", wrapAsync(searchWithFilters));
-
+router.put("/resetPassword", authenticate, wrapAsync(resetPassword));
+router.put("/updatePassword/:id", authenticate, wrapAsync(updatePassword));
 
 module.exports = router;
